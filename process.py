@@ -4,7 +4,7 @@ import control
 
 
 T = 0.1  # sampling time
-sigma_w = 1  # process variance (m/s)^2
+sigma_w = 0.1  # process variance (m/s)^2
 # State transition matrix, A
 A = np.array([[1, T],
               [0, 1]])
@@ -18,5 +18,5 @@ sys = control.ss(A, B, C, 0, T)
 if __name__ == "__main__":
     time = np.arange(0, 21, T)
     _, x = control.step_response(sys, time)
-    plt.plot(time, x)
+    plt.plot(time, x[0])
     plt.show()
