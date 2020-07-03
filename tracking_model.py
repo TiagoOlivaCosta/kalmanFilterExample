@@ -33,7 +33,8 @@ def msq_error(x, y):
 plt.plot(t, x_dot)
 y_dot = [speed(i) for i in x_dot]
 plt.plot(t, y_dot)
-print("Speedometer error:", np.sqrt(msq_error(x_dot, y_dot)))
+error = np.sqrt(msq_error(x_dot, y_dot))
+print(f"Speedometer error: {error:.2f} m/s")
 plt.show()
 
 # position
@@ -41,4 +42,5 @@ y = [gps_measurement(i) for i in x]
 plt.plot(t, x)
 plt.plot(t, y)
 plt.show()
-print("GPS error:", np.sqrt(msq_error(x, y)))
+error = np.sqrt(msq_error(x, y))
+print(f"GPS error: {error:.2f} m")
