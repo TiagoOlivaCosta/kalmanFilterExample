@@ -45,7 +45,8 @@ if __name__ == "__main__":
 
     # speedometer
     h_speed = np.array([[0, 1]])  # observation matrix
-    r_speed = np.array([[1]])
+    var_speedometer = 1**2
+    r_speed = np.array([[var_speedometer]])
     sys_speed = control.ss(process.A, process.B, h_speed, 0, dt)
     kf_speed = Kalman(sys_speed, process.Q, r_speed)
     speedometer = sensors.Speedometer()
@@ -61,7 +62,8 @@ if __name__ == "__main__":
 
     # GPS
     h_gps = np.array([[1, 0]])  # observation matrix
-    r_gps = np.array([[10]])
+    var_gps = 7**2
+    r_gps = np.array([[var_gps]])
     sys_gps = control.ss(process.A, process.B, h_gps, 0, dt)
     kf_gps = Kalman(sys_gps, process.Q, r_gps)
     gps = sensors.GPS()
@@ -79,4 +81,26 @@ if __name__ == "__main__":
     plt.plot(time, x[0])
     plt.plot(time, x_speedometer)
     plt.plot(time, x_gps)
+
+    H = np.eye(2)
+    sys_fused = control.ss(process.A, process.B, H, 0, dt)
+    r_fused = np.diag([var_gps, 100*var_speedometer])
+    kf_fused = Kalman(sys_fused, process.Q, r_fused)
+    gps = sensors.GPS()
+    x_fused = np.zeros(len(time))
+    z_fused = np.zeros((len(time), 2))
+    for i, t in enumerate(time):
+        z = np.array(gps.measurement(x[0][i]),
+                     speedometer.measurement(x[1][i]))
+        z_fused[i, :] = z
+        kf_fused.filter(0, z)
+        x_fused[i] = kf_fused.x[0]
+    plt.plot(time, x_fused)
+    plt.plot(time, x_gps)
+    plt.plot(time, z_gps)
+    # plt.plot(time, x_speedometer)
+    plt.plot(time, x[0])
+    plt.show()
+
+
     plt.show()
