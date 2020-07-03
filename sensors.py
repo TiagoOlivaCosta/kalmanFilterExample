@@ -16,13 +16,17 @@ class Speedometer:
         return self.bias*x_dot + nu
 
 
-def gps_measurement(x):
-    # "autonomous civilian GPS horizontal position fixes
-    #  are typically accurate to about 15 meters "  - Wikipedia
-    # entao 2*sigma = 15m
-    sigma_nu = 15.0/2  # m
-    nu = np.random.randn()*sigma_nu
-    return x + nu
+class GPS:
+    def __init__(self):
+        pass
+
+    def measurement(self, x):
+        # "autonomous civilian GPS horizontal position fixes
+        #  are typically accurate to about 15 meters "  - Wikipedia
+        # entao 2*sigma = 15m
+        sigma_nu = 15.0/2  # m
+        nu = np.random.randn()*sigma_nu
+        return x + nu
 
 
 def msq_error(x, y):
