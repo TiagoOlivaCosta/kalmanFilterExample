@@ -1,9 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-t = np.linspace(0, 20, 100)  # time
-x_dot = 20*np.ones(len(t))  # m/s
-x = t*x_dot  # position (m)
 
 
 class Speedometer:
@@ -33,23 +30,28 @@ def msq_error(x, y):
     return sum((x-y)**2)/len(x)
 
 
-# speed
-plt.plot(t, x_dot)
-speedometer = Speedometer()
-y_dot = [speedometer.speed(i) for i in x_dot]
-plt.plot(t, y_dot)
-msqerror = np.sqrt(msq_error(x_dot, y_dot))
-avgerror = np.average(y_dot-x_dot)
-print(f"Sqrt of MSq speed error: {msqerror:.2f} m/s")
-print(f"Average error: {avgerror:.2f} m/s")
-plt.show()
+if __name__ == "__main__":
+    t = np.linspace(0, 20, 100)  # time
+    x_dot = 20*np.ones(len(t))  # m/s
+    x = t*x_dot  # position (m)
 
-# position
-y = [gps_measurement(i) for i in x]
-plt.plot(t, x)
-plt.plot(t, y)
-plt.show()
-msqerror = np.sqrt(msq_error(x, y))
-avgerror = np.average(y-x)
-print(f"Sqrt of MSq  GPS error: {msqerror:.2f} m/s")
-print(f"Average GPS error: {avgerror:.2f} m/s")
+    # speed
+    plt.plot(t, x_dot)
+    speedometer = Speedometer()
+    y_dot = [speedometer.speed(i) for i in x_dot]
+    plt.plot(t, y_dot)
+    msqerror = np.sqrt(msq_error(x_dot, y_dot))
+    avgerror = np.average(y_dot-x_dot)
+    print(f"Sqrt of MSq speed error: {msqerror:.2f} m/s")
+    print(f"Average error: {avgerror:.2f} m/s")
+    plt.show()
+
+    # position
+    y = [gps_measurement(i) for i in x]
+    plt.plot(t, x)
+    plt.plot(t, y)
+    plt.show()
+    msqerror = np.sqrt(msq_error(x, y))
+    avgerror = np.average(y-x)
+    print(f"Sqrt of MSq  GPS error: {msqerror:.2f} m/s")
+    print(f"Average GPS error: {avgerror:.2f} m/s")
