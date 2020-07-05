@@ -24,7 +24,7 @@ class Kalman:
         return x_pri, pp_pri
 
     def update(self, x_pri, pp_pri, measurement):
-        x, pp, z = self.x, pp_pri, measurement
+        x, pp, z = x_pri, pp_pri, measurement
         y_s = z - self.H.dot(x)  # inovation, pre-fit residue
         ss = (self.H.dot(pp)).dot(self.H.T) + self.R  # inovation covariance
         kk = pp.dot(self.H.T).dot(ss.I)  # Kalman gain
@@ -90,9 +90,6 @@ if __name__ == "__main__":
     plt.plot(time, z_gps)
     plt.show()
 
-    plt.plot(time, x[0])
-    plt.plot(time, x_speedometer)
-    plt.plot(time, x_gps)
 
     # Kalman fusion biased
     H = np.eye(2)
