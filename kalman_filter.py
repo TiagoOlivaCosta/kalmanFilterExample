@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import process
 import control
+import covariance_intersection as CI
+import process
 import sensors
 
 
@@ -82,9 +83,10 @@ if __name__ == "__main__":
     plt.plot(time, x_speedometer)
     plt.plot(time, x_gps)
 
+    # Kalman fusion
     H = np.eye(2)
     sys_fused = control.ss(process.A, process.B, H, 0, dt)
-    r_fused = np.diag([var_gps, 100*var_speedometer])
+    r_fused = np.diag([var_gps, 10*var_speedometer])
     kf_fused = Kalman(sys_fused, process.Q, r_fused)
     gps = sensors.GPS()
     x_fused = np.zeros(len(time))
@@ -103,4 +105,18 @@ if __name__ == "__main__":
     plt.show()
 
 
+    # CI fusion
+    kf_gps = Kalman(sys_gps, process.Q, r_gps)
+    kf_speed = Kalman(sys_speed, process.Q, r_speed)
+    covint = CI.CovarianceIntersection()
+    x_ci = np.zeros(len(time))
+    for i, t in enumerate(time):
+        z_g, z_s = gps.measurement(x[0][i]), speedometer.measurement(x[1][i])
+        kf_gps.filter(0, z_g), kf_speed.filter(0, z_s)
+        ci, _ = covint.fuse(kf_gps.x, kf_gps.P, kf_speed.x, kf_speed.P)
+        x_ci[i] = ci[0]
+    plt.plot(time, x[0], label='model')
+    plt.plot(time, x_ci, label='covariance intersection')
+    plt.plot(time, x_fused, label='kalman')
+    plt.legend(loc='lower right')
     plt.show()
