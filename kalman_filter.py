@@ -46,19 +46,30 @@ if __name__ == "__main__":
 
     # speedometer
     h_speed = np.array([[0, 1]])  # observation matrix
-    var_speedometer = 1**2
+    var_speedometer = 1.7**2
     r_speed = np.array([[var_speedometer]])
     sys_speed = control.ss(process.A, process.B, h_speed, 0, dt)
     kf_speed = Kalman(sys_speed, process.Q, r_speed)
+    kf_speed_unbiased = Kalman(sys_speed, process.Q, r_speed)
     speedometer = sensors.Speedometer()
+    speedometer_unbiased = sensors.Speedometer(mode="unbiased")
     x_speedometer = np.zeros(len(time))
     z_speedometer = np.zeros(len(time))
+    x_speedometer_unbiased = np.zeros(len(time))
+    z_speedometer_unbiased = np.zeros(len(time))
     for i, t in enumerate(time):
         z = speedometer.measurement(x[1][i])
         z_speedometer[i] = z
         kf_speed.filter(0, z)
         x_speedometer[i] = kf_speed.x[0]
+
+        # unbiased version
+        z = speedometer_unbiased.measurement(x[1][i])
+        z_speedometer_unbiased[i] = z
+        kf_speed_unbiased.filter(0, z)
+        x_speedometer_unbiased[i] = kf_speed_unbiased.x[0]
     plt.plot(time, x_speedometer)
+    plt.plot(time, x_speedometer_unbiased)
     plt.show()
 
     # GPS
@@ -83,10 +94,10 @@ if __name__ == "__main__":
     plt.plot(time, x_speedometer)
     plt.plot(time, x_gps)
 
-    # Kalman fusion
+    # Kalman fusion biased
     H = np.eye(2)
     sys_fused = control.ss(process.A, process.B, H, 0, dt)
-    r_fused = np.diag([var_gps, 10*var_speedometer])
+    r_fused = np.diag([var_gps, var_speedometer])
     kf_fused = Kalman(sys_fused, process.Q, r_fused)
     gps = sensors.GPS()
     x_fused = np.zeros(len(time))
@@ -103,6 +114,18 @@ if __name__ == "__main__":
     # plt.plot(time, x_speedometer)
     plt.plot(time, x[0])
     plt.show()
+
+
+    # Kalman fusion unbiased
+    kf_unbiased = Kalman(sys_fused, process.Q, r_fused)
+    x_unbiased = np.zeros(len(time))
+    z_unbiased = np.zeros((len(time), 2))
+    for i, t in enumerate(time):
+        z = np.array(gps.measurement(x[0][i]),
+                     speedometer_unbiased.measurement(x[1][i]))
+        z_unbiased[i, :] = z
+        kf_unbiased.filter(0, z)
+        x_unbiased[i] = kf_unbiased.x[0]
 
 
     # CI fusion
