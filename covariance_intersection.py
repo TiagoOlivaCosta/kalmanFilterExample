@@ -2,6 +2,7 @@ from scipy.optimize import fminbound
 from numpy.linalg import inv, det
 import numpy as np
 
+
 class CovarianceIntersection(object):
     """
     Covariance Intersection according to http://discovery.ucl.ac.uk/135541/
@@ -25,9 +26,9 @@ class CovarianceIntersection(object):
         return w_a, w_b
 
     def fuse_cov(self, cov_a, cov_b, omega):
-        wIa, wIb = self.cov_weighting(cov_a, cov_b, omega)
-        C = inv(wIa + wIb)
-        return C
+        w_info_a, w_info_b = self.cov_weighting(cov_a, cov_b, omega)
+        info_c = inv(w_info_a + w_info_b)
+        return info_c
 
     def fuse(self, mean_a, cov_a, mean_b, cov_b):
         omega = self.optimize_omega(cov_a, cov_b)
