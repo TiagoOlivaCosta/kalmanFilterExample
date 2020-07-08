@@ -3,9 +3,8 @@ from numpy.linalg import inv, det
 import numpy as np
 
 
-class CovarianceIntersection(object):
+class CovarianceIntersection:
     """
-    Covariance Intersection according to http://discovery.ucl.ac.uk/135541/
     """
     def __init__(self, performance_criterion="Trace"):
         assert type(performance_criterion) is str
@@ -18,6 +17,9 @@ class CovarianceIntersection(object):
             raise ValueError
         self.algorithm_name = "Covariance Intersection"
         self.algorithm_abbreviation = "CI"
+
+        self.omega = 0
+        self.state = np.array()
 
     @staticmethod
     def cov_weighting(cov_a, cov_b, omega):
@@ -36,6 +38,12 @@ class CovarianceIntersection(object):
         cov = inv(w_a + w_b)
         mean = np.dot(cov, (np.dot(w_a, mean_a) + np.dot(w_b, mean_b)))
         return mean, cov
+
+    def fusion(self, estimate_a, estimate_b):
+        assert type(estimate_a) is tuple and type(estimate_b) is tuple
+        x_a, cov_a = estimate_a
+        x_b, cov_b = estimate_b
+
 
     def optimize_omega(self, cov_a, cov_b):
         def optimize_fn(omega):
